@@ -73,4 +73,19 @@ public class SimulationServiceImpl implements SimulationService {
                 .status(HttpStatus.OK)
                 .body("Simulation deleted successfully!");
     }
+
+    @Override
+    public ResponseEntity<Simulation> updateSimulation(long id, Simulation simulation) {
+        Simulation savedSimulation = null;
+
+        try {
+            savedSimulation = simulationRepository.findById(id).orElseThrow(() -> new RuntimeException("Simulation not found"));
+            simulation.setId(id);
+            simulationRepository.save(simulation);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(savedSimulation);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(savedSimulation);
+    }
 }

@@ -33,4 +33,9 @@ public class SimulationController {
     public ResponseEntity<String> deleteSimulationById(@PathVariable("id") long id) {
         return simulationService.deleteSimulationById(id);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Simulation> updateSimulation(@PathVariable("id") long id, @RequestBody Simulation simulation) {
+        return simulationService.updateSimulation(id, simulation);
+    }
 }

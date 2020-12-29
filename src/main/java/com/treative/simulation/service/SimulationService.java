@@ -8,4 +8,5 @@ public interface SimulationService {
     ResponseEntity<Simulation> getSimulationById(long id);
     ResponseEntity<Simulation> getSimulationByName(String name);
     ResponseEntity<String> deleteSimulationById(long id);
+    ResponseEntity<Simulation> updateSimulation(long id, Simulation simulation);
 }
