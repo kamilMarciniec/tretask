@@ -8,8 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
+import java.util.Map;
 
 @Service
 public class SimulationServiceImpl implements SimulationService {
@@ -79,7 +82,7 @@ public class SimulationServiceImpl implements SimulationService {
         Simulation savedSimulation = null;
 
         try {
-            savedSimulation = simulationRepository.findById(id).orElseThrow(() -> new RuntimeException("Simulation not found"));
+            savedSimulation = getSimulationByIdOrThrowException(id);
             simulation.setId(id);
             simulationRepository.save(simulation);
         } catch (RuntimeException e) {
@@ -87,5 +90,38 @@ public class SimulationServiceImpl implements SimulationService {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(savedSimulation);
+    }
+
+    @Override
+    public ResponseEntity<Simulation> updateSimulationFields(long id, Map<String, Object> fields) {
+        Simulation simulation = null;
+
+        try {
+            simulation = getSimulationByIdOrThrowException(id);
+            Simulation finalSimulation = simulation;
+
+            fields.forEach((k, v) -> {
+                Field field = ReflectionUtils.findField(Simulation.class, k);
+                field.setAccessible(true);
+
+                if (k.equals("p")) {
+                    ReflectionUtils.setField(field, finalSimulation, Long.valueOf(v.toString()));
+                } else {
+                    ReflectionUtils.setField(field, finalSimulation, v);
+                }
+
+            });
+
+            simulationRepository.save(simulation);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(simulation);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(simulation);
+    }
+
+    private Simulation getSimulationByIdOrThrowException(long id) {
+        return simulationRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Simulation not found"));
     }
 }

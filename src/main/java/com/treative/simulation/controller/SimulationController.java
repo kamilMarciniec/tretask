@@ -7,6 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @RestController
 @RequestMapping("/api/simulation")
 public class SimulationController {
@@ -37,5 +41,10 @@ public class SimulationController {
     @PutMapping("/{id}")
     public ResponseEntity<Simulation> updateSimulation(@PathVariable("id") long id, @RequestBody Simulation simulation) {
         return simulationService.updateSimulation(id, simulation);
+    }
+
+    @PatchMapping(value = "/{id}")
+    public ResponseEntity<Simulation> updateSimulationFieldsById(@PathVariable("id") long id, @RequestBody Map<String, Object> fields) {
+        return simulationService.updateSimulationFields(id, fields);
     }
 }
